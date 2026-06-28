@@ -1,10 +1,20 @@
 import i18next from 'i18next';
 import zh from './zh.js'
+import zhTW from './zh-TW.js'
 import en from './en.js'
 import app from '../hono/hono';
 
+function resolveLang(header) {
+	if (!header) return undefined
+	const lower = header.toLowerCase()
+	if (lower.includes('tw') || lower.includes('hk') || lower.includes('mo') || lower.includes('hant')) {
+		return 'zh-TW'
+	}
+	return header.split('-')[0]
+}
+
 app.use('*', async (c, next) => {
-	const lang = c.req.header('accept-language')?.split('-')[0]
+	const lang = resolveLang(c.req.header('accept-language'))
 	i18next.init({
 		lng: lang,
 	});
@@ -17,6 +27,9 @@ const resources = {
 	},
 	zh: {
 		translation: zh,
+	},
+	'zh-TW': {
+		translation: zhTW,
 	},
 };
 
